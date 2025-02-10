@@ -1,16 +1,22 @@
-name: Build & deploy images
+name: Build & publish images
 
 on:
   workflow_dispatch:
   release:
     types: [published]
 
-permissions:
-  packages: write
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build:
+  build-and-push-image:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
     env:
       PB_VERSION: '0.25.2'
     steps:
@@ -20,9 +26,15 @@ jobs:
       - name: Login to ghcr
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -40,8 +52,5 @@ jobs:
           build-args: |
             VERSION=${{ env.PB_VERSION }}
           # build-args: VERSION=${{ steps.version.outputs.value }}
-          tags: |
-            ghcr.io/${{ github.repository }}:${{ env.PB_VERSION }}
-            ghcr.io/${{ github.repository }}:latest
-            ${{ github.repository }}:${{ env.PB_VERSION }}
-            ${{ github.repository }}:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
