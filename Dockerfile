@@ -13,7 +13,7 @@ RUN apk add --no-cache \
     ca-certificates
 
 # download and unzip PocketBase
-ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}${BUILDX_ARCH}.zip /tmp/pb.zip
+ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_${BUILDX_ARCH}.zip /tmp/pb.zip
 RUN unzip /tmp/pb.zip -d /pb/ \
     && chmod +x /pb/pocketbase \
     && rm -rf /var/cache/apk/* \
