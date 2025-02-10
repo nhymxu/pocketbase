@@ -1,4 +1,4 @@
-name: Build & deploy images to Docker Registry
+name: Build & deploy images
 
 on:
   workflow_dispatch:
