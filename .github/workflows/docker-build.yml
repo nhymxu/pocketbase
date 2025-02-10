@@ -5,6 +5,9 @@ on:
   release:
     types: [published]
 
+permissions:
+  packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,7 +21,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up QEMU
@@ -35,7 +38,6 @@ jobs:
           provenance: false
           file: ${{ env.DOCKER_FILE }}
           platforms: linux/amd64,linux/arm/v7,linux/arm64
-          
           build-args: |
             VERSION=${{ env.PB_VERSION }}
           # build-args: VERSION=${{ steps.version.outputs.value }}
@@ -44,5 +46,3 @@ jobs:
             ghcr.io/${{ github.repository }}:latest
             ${{ github.repository }}:${{ env.PB_VERSION }}
             ${{ github.repository }}:latest
-          cache-from: type=registry,ref=${{ github.repository	}}:latest
-          cache-to: type=inline
