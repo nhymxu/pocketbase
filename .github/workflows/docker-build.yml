@@ -36,7 +36,6 @@ jobs:
           context: .
           push: true
           provenance: false
-          file: ${{ env.DOCKER_FILE }}
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           build-args: |
             VERSION=${{ env.PB_VERSION }}
